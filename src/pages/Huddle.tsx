@@ -29,6 +29,9 @@ import type { Unavailability } from "../services/unavailability";
 
 import { messageFromUnknown } from "../lib/safeSupabase";
 
+// NEW: actuals dialog
+import LogActualDialog from "../components/LogActualDialog";
+
 const SOFT_CAP = 6.5;
 
 function todayISO() {
@@ -49,6 +52,17 @@ export default function HuddlePage() {
   const [inits, setInits] = useState<Initiative[]>([]);
   const [rows, setRows] = useState<DailyAllocation[]>([]);
   const [unavail, setUnavail] = useState<Unavailability[]>([]);
+
+  // NEW: Log actual dialog state
+  const [actualDlgOpen, setActualDlgOpen] = useState(false);
+  const [actualCtx, setActualCtx] = useState<{
+    initiativeId: number;
+    personId: number;
+    date: string;
+    planned: number;
+    personName?: string;
+    initiativeName?: string;
+  } | null>(null);
 
   // UI
   const [loading, setLoading] = useState(false);
@@ -299,7 +313,7 @@ export default function HuddlePage() {
                   {p.blocked && <BlockIcon fontSize="small" color="action" />}
                 </Box>
 
-                {/* Right: Allocations list (each item = two lines) */}
+                {/* Right: Allocations list (each item = two lines + Log actual button) */}
                 <Box sx={{ width: "72%", display: "grid", gap: 1.25 }}>
                   {p.items.length === 0 ? (
                     <Typography variant="body2" color="text.secondary">
@@ -315,21 +329,40 @@ export default function HuddlePage() {
                         {/* Line 1: Project name */}
                         <Typography sx={{ fontWeight: 600 }}>{item.initiative_name}</Typography>
 
-                        {/* Line 2: Editable hours */}
+                        {/* Line 2: Editable hours + Log actual */}
                         {p.blocked ? (
                           <Chip size="small" color="warning" label={p.reason || "Unavailable"} />
                         ) : (
-                          <TextField
-                            type="number"
-                            size="small"
-                            inputProps={{ min: 0, max: 24, step: 0.5 }}
-                            value={item.hours}
-                            onChange={(e) => setItemHours(p.person_id, item.initiative_id, Number(e.target.value))}
-                            sx={{
-                              maxWidth: 140,
-                              "& input": { textAlign: "center", fontSize: 16, fontWeight: 700, py: 1 },
-                            }}
-                          />
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <TextField
+                              type="number"
+                              size="small"
+                              inputProps={{ min: 0, max: 24, step: 0.5 }}
+                              value={item.hours}
+                              onChange={(e) => setItemHours(p.person_id, item.initiative_id, Number(e.target.value))}
+                              sx={{
+                                maxWidth: 140,
+                                "& input": { textAlign: "center", fontSize: 16, fontWeight: 700, py: 1 },
+                              }}
+                            />
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                setActualCtx({
+                                  initiativeId: item.initiative_id,
+                                  personId: p.person_id,
+                                  date,
+                                  planned: Number(item.hours || 0),
+                                  personName: p.person_name,
+                                  initiativeName: item.initiative_name,
+                                });
+                                setActualDlgOpen(true);
+                              }}
+                            >
+                              Log actual
+                            </Button>
+                          </Box>
                         )}
                       </Paper>
                     ))
@@ -340,6 +373,24 @@ export default function HuddlePage() {
           })
         )}
       </Paper>
+
+      {/* Log Actual dialog */}
+      {actualDlgOpen && actualCtx && (
+        <LogActualDialog
+          open={actualDlgOpen}
+          onClose={() => setActualDlgOpen(false)}
+          initiativeId={actualCtx.initiativeId}
+          personId={actualCtx.personId}
+          date={actualCtx.date}
+          planned={actualCtx.planned}
+          personName={actualCtx.personName}
+          initiativeName={actualCtx.initiativeName}
+          onSuccess={() => {
+            setActualDlgOpen(false);
+            void loadDay();
+          }}
+        />
+      )}
     </Container>
   );
 }

@@ -15,6 +15,10 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import { Link, useLocation } from "react-router-dom";
 
+
+// Inside your <Routes>:
+
+
 const routes = [
   { label: "Home", path: "/", icon: <HomeOutlinedIcon fontSize="small" /> },
   { label: "Dashboard", path: "/dashboard", icon: <DashboardIcon fontSize="small" /> },
@@ -24,6 +28,8 @@ const routes = [
   { label: "Daily Allocations", path: "/daily-allocations", icon: <WorkspacesIcon fontSize="small" /> },
   { label: "Huddle", path: "/huddle", icon: <PlaylistAddCheckIcon fontSize="small" /> },
   { label: "Availablity Page", path: "/availability", icon: <PlaylistAddCheckIcon fontSize="small" /> },
+  { label: "InitiativePage", path: "/InitiativeSchedulePage", icon: <PlaylistAddCheckIcon fontSize="small" /> }
+  
   
 ];
 

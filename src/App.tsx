@@ -15,6 +15,10 @@ import AllocationsPage from "./pages/Allocations";
 import DailyAllocationsPage from "./pages/DailyAllocations";
 import HuddlePage from "./pages/Huddle";
 import AvailabilityPage from "./pages/AvailabilityPage";
+import InitiativeSchedulePage from "./pages/InitiativeSchedule";
+
+// Inside your <Routes>:
+
 export default function App() {
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
   const [msg, setMsg] = useState("");
@@ -68,6 +72,7 @@ export default function App() {
         <Route path="/daily-allocations" element={<DailyAllocationsPage />} />
         <Route path="/huddle" element={<HuddlePage />} />
         <Route path="/availability" element={<AvailabilityPage />} />
+        <Route path="/InitiativeSchedulePage" element={<InitiativeSchedulePage />} />
       </Routes>
     </AppShell>
   );
